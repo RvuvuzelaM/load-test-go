@@ -1,0 +1,28 @@
+#
+# IDE/editors
+#
+.idea
+
+.vscode
+
+#
+# OS
+#
+.DS_Store
+
+#
+# Project files
+#
+
+# binary
+/loadtest
+
+# build dir
+/build/*
+!/build/.keep
+
+# secrets
+/.env
+
+# golang
+**/vendor
