@@ -1,12 +1,11 @@
 package restapi
 
 import (
-	"fmt"
-	"io"
 	"net/http"
-	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/vuvuzela/loadtest/httpx"
+	"github.com/vuvuzela/loadtest/internal/loadtestrest"
 )
 
 var (
@@ -25,27 +24,18 @@ var LoadTestCmd = &cobra.Command{
 			Allows one to test REST API capabilites by bombarding with requests.
 			What is recomended is to first make test request to your API, and then load test it.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		jobs := make(chan int, numOfRequests)
-		results := make(chan string, numOfRequests)
+		httpClient := &http.Client{}
+		httpxClient := httpx.NewClient(httpClient)
+		svc := loadtestrest.NewService(httpxClient)
 
-		for i := 1; i <= concurentRequests; i++ {
-			go worker(i, jobs, results)
+		in := loadtestrest.LoadTestRestAPIInput{
+			NumOfRequests:     numOfRequests,
+			ConcurentRequests: concurentRequests,
+			RequestMethod:     reqMethod,
+			Endpoint:          endpoint,
+			RequestBody:       reqBody,
 		}
-
-		for i := 1; i <= numOfRequests; i++ {
-			jobs <- i
-		}
-		close(jobs)
-
-		for i := 1; i <= numOfRequests; i++ {
-			_, ok := <-results
-			if ok {
-				if i%100 == 0 || i == 1 {
-					fmt.Println(i)
-				}
-			}
-		}
-		close(results)
+		svc.LoadTestRestAPI(in)
 	},
 }
 
@@ -56,35 +46,4 @@ func init() {
 
 	LoadTestCmd.Flags().IntVarP(&concurentRequests, "number-of-workers", "w", 1, "number of concurrent workers for requests")
 	LoadTestCmd.Flags().IntVarP(&numOfRequests, "num-of-requests", "n", 1, "overall number of requests")
-}
-
-func worker(id int, jobs <-chan int, results chan<- string) {
-	c := &http.Client{}
-
-	for range jobs {
-		var body io.Reader
-		if reqBody != "" {
-			body = strings.NewReader(reqBody)
-		}
-
-		req, err := http.NewRequest(reqMethod, endpoint, body)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		resp, err := c.Do(req)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		respByte, err := io.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		results <- string(respByte)
-	}
 }
