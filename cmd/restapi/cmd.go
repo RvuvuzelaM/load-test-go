@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/spf13/cobra"
-	"github.com/vuvuzela/loadtest/httpx"
 	"github.com/vuvuzela/loadtest/internal/loadtestrest"
+	"github.com/vuvuzela/loadtest/pkg/httpx"
 )
 
 var (
