@@ -10,13 +10,6 @@
 #
 .DS_Store
 
-#
-# Project files
-#
-
-# binary
-/loadtest
-
 # build dir
 /build/*
 !/build/.keep
