@@ -6,7 +6,7 @@ import (
 
 //go:generate go run -mod=mod github.com/golang/mock/mockgen --source=./service.go --destination=./mock/httpclient.go github.com/vuvuzela/loadtest/internal/loadtestrest/httpclient HTTPClient
 type HTTPClient interface {
-	MakeRequest(reqMethod, endpoint, reqBody string) (string, error)
+	MakeRequest(reqMethod, endpoint, reqBody string, headers map[string]string) (string, error)
 }
 
 type Service struct {
@@ -22,6 +22,7 @@ func NewService(httpClient HTTPClient) Service {
 type LoadTestRestAPIInput struct {
 	NumOfRequests, ConcurentRequests     int
 	RequestMethod, Endpoint, RequestBody string
+	Headers                              map[string]string
 }
 
 func (in LoadTestRestAPIInput) Validate() error {
@@ -33,7 +34,7 @@ func (s Service) LoadTestRestAPI(in LoadTestRestAPIInput) ([]string, error) {
 	results := make(chan string, in.NumOfRequests)
 
 	for i := 1; i <= in.ConcurentRequests; i++ {
-		go s.makeRequests(in.RequestMethod, in.Endpoint, in.RequestBody, jobs, results)
+		go s.makeRequests(in.RequestMethod, in.Endpoint, in.RequestBody, in.Headers, jobs, results)
 	}
 
 	for i := 1; i <= in.NumOfRequests; i++ {
@@ -56,9 +57,9 @@ func (s Service) LoadTestRestAPI(in LoadTestRestAPIInput) ([]string, error) {
 	return resp, nil
 }
 
-func (s Service) makeRequests(reqMethod, endpoint, reqBody string, jobs <-chan int, results chan<- string) {
+func (s Service) makeRequests(reqMethod, endpoint, reqBody string, headers map[string]string, jobs <-chan int, results chan<- string) {
 	for range jobs {
-		resp, err := s.httpClient.MakeRequest(reqMethod, endpoint, reqBody)
+		resp, err := s.httpClient.MakeRequest(reqMethod, endpoint, reqBody, headers)
 		if err != nil {
 			fmt.Println(err)
 			return

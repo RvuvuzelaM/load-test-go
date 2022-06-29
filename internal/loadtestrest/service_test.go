@@ -15,7 +15,7 @@ func TestLoadTestRestAPI(t *testing.T) {
 	svc := NewService(mockHTTPClient)
 
 	mockHTTPClient.EXPECT().
-		MakeRequest(gomock.Any(), gomock.Any(), gomock.Any()).
+		MakeRequest(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return(`{"test": "test"}`, nil).
 		Times(10)
 

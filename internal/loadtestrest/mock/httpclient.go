@@ -34,16 +34,16 @@ func (m *MockHTTPClient) EXPECT() *MockHTTPClientMockRecorder {
 }
 
 // MakeRequest mocks base method.
-func (m *MockHTTPClient) MakeRequest(reqMethod, endpoint, reqBody string) (string, error) {
+func (m *MockHTTPClient) MakeRequest(reqMethod, endpoint, reqBody string, headers map[string]string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MakeRequest", reqMethod, endpoint, reqBody)
+	ret := m.ctrl.Call(m, "MakeRequest", reqMethod, endpoint, reqBody, headers)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // MakeRequest indicates an expected call of MakeRequest.
-func (mr *MockHTTPClientMockRecorder) MakeRequest(reqMethod, endpoint, reqBody interface{}) *gomock.Call {
+func (mr *MockHTTPClientMockRecorder) MakeRequest(reqMethod, endpoint, reqBody, headers interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeRequest", reflect.TypeOf((*MockHTTPClient)(nil).MakeRequest), reqMethod, endpoint, reqBody)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeRequest", reflect.TypeOf((*MockHTTPClient)(nil).MakeRequest), reqMethod, endpoint, reqBody, headers)
 }

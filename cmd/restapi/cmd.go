@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/vuvuzela/loadtest/internal/loadtestrest"
+	"github.com/vuvuzela/loadtest/pkg/flagsx"
 	"github.com/vuvuzela/loadtest/pkg/httpx"
 )
 
@@ -15,6 +16,8 @@ var (
 
 	numOfRequests     int
 	concurentRequests int
+
+	headers map[string]string
 )
 
 var LoadTestCmd = &cobra.Command{
@@ -34,6 +37,7 @@ var LoadTestCmd = &cobra.Command{
 			RequestMethod:     reqMethod,
 			Endpoint:          endpoint,
 			RequestBody:       reqBody,
+			Headers:           headers,
 		}
 		svc.LoadTestRestAPI(in)
 	},
@@ -46,4 +50,6 @@ func init() {
 
 	LoadTestCmd.Flags().IntVarP(&concurentRequests, "number-of-workers", "w", 1, "number of concurrent workers for requests")
 	LoadTestCmd.Flags().IntVarP(&numOfRequests, "num-of-requests", "n", 1, "overall number of requests")
+
+	LoadTestCmd.Flags().Var(&flagsx.JSONFlag{&headers}, "headers", "headers for requests")
 }

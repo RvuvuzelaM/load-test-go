@@ -16,7 +16,7 @@ func NewClient(httpClient *http.Client) Client {
 	}
 }
 
-func (c Client) MakeRequest(reqMethod, endpoint, reqBody string) (string, error) {
+func (c Client) MakeRequest(reqMethod, endpoint, reqBody string, headers map[string]string) (string, error) {
 	var body io.Reader
 	if reqBody != "" {
 		body = strings.NewReader(reqBody)
@@ -25,6 +25,10 @@ func (c Client) MakeRequest(reqMethod, endpoint, reqBody string) (string, error)
 	req, err := http.NewRequest(reqMethod, endpoint, body)
 	if err != nil {
 		return "", err
+	}
+
+	for k, v := range headers {
+		req.Header.Add(k, v)
 	}
 
 	resp, err := c.http.Do(req)
